@@ -1,0 +1,52 @@
+prog → classDecl | funcDef
+classDecl → class id classDeclBody { classDeclTail } ;
+classDeclBody → isa id classDeclBodyTail | ϵ
+classDeclBodyTail → , id classDeclBodyTail | ϵ
+classDeclTail → visibility memberDecl classDeclTail | ϵ
+visibility → public | private | ϵ
+memberDecl → memberFuncDecl | memberVarDecl
+memberFuncDecl → function id : ( fParams ) arrow returnType ; | constructor : ( fParams ) ;
+memberVarDecl → attribute id : type memberVarDeclTail ;
+memberVarDeclTail → arraySize memberVarDeclTail | ϵ
+funcDef → funcHead funcBody
+funcHead → function funcHeadTail id ( fParams ) arrow returnType | function id sr constructor ( fParams )
+funcHeadTail →  id sr | ϵ
+funcBody → { funcBodyTail }
+funcBodyTail → localVarDeclOrStmt funcBodyTail | ϵ
+localVarDeclOrStmt → localVarDecl | statement
+localVarDecl → localVar id : type localVarDeclTail ; | localVar id : type ( aParams ) ;
+localVarDeclTail → arraySize localVarDeclTail | ϵ
+statement → assignStat ; | if ( relExpr ) then statBlock else statBlock ; | while ( relExpr ) statBlock ; | read ( variable ) ;
+| write ( expr ) ; | return ( expr ) ; | functionCall ;
+assignStat → variable assignOp expr
+statBlock → { statBlockTail } | statement | ϵ
+statBlockTail → statement statBlockTail | ϵ
+expr → arithExpr | relExpr
+relExpr → arithExpr relOp arithExpr
+arithExpr → arithExpr addOp term | term
+sign → + | –
+term → term multOp factor | factor
+factor → variable | functionCall | intLit | floatLit | ( arithExpr ) | not factor | sign factor
+variable → idnestBody id indiceBody
+functionCall → idnestBody id ( aParams )
+idnestBody → idnest idnestBody | ϵ
+
+idnest → id idnestTail . | id ( aParams ) .
+idnestTail → indice idnestTail | ϵ
+indice → [ arithExpr ]
+indiceBody → indice indiceBody | ϵ
+
+arraySize → [ intLit ] | [ ]
+type → integer | float | id
+returnType → type | void
+fParams → id : type fParamsBody fParamsBodyTail| ϵ
+fParamsBody → arraySize fParamsBody | ϵ
+fParamsBodyTail → fParamsTail fParamsBodyTail | ϵ
+aParams → expr aParamsBody | ϵ
+aParamsBody → aParamsTail aParamsBody | ϵ
+fParamsTail → , id : type fParamsBody
+aParamsTail → , expr
+assignOp → =
+relOp → eq | neq | lt | gt | leq | geq
+addOp → + | – | or
+multOp → * | / | and
